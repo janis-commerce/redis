@@ -2,7 +2,7 @@
   "name": "@janiscommerce/redis",
   "version": "0.0.1",
   "description": "A Driver to use Redis",
-  "main": "lib/index.js",
+  "main": "lib/redis.js",
   "scripts": {
     "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/",
     "test-ci": "nyc --reporter=html --reporter=text mocha --recursive tests/",
@@ -31,5 +31,8 @@
   ],
   "directories": {
     "test": "tests"
+  },
+  "dependencies": {
+    "redis": "^2.8.0"
   }
 }
