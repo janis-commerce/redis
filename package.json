@@ -33,6 +33,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "@janiscommerce/settings": "^1.0.1",
     "redis": "^2.8.0"
   }
 }
