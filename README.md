@@ -49,9 +49,10 @@ Throw an `RedisError` if Redis Server fails.
 **async** | Get a value.
 
 * `entity`, type: `string`, main key.
-* `id`, type: `string`, sub key.
+* `id`, type: `string`, sub key. *OPTIONAL*
 
-Returns an `object`, with the value. If it not exists returns `null`.
+With `ìd` - Returns an `object`, with the value. If it not exists returns `null`. 
+Without `ìd` - Returns an `array`, with the values of the Entity or an empty array (if no values are found)
 
 Throw an `RedisError` if Redis Server fails.
 
@@ -113,6 +114,14 @@ console.log(itemGetted); // { name: 'BatGun', description: 'deprecated gun' }
 itemGetted = await Redis.get('Batman', 'artifact-02');
 
 console.log(itemGetted); // null
+
+itemGetted = await Redis.get('Batman');
+
+console.log(itemGetted); // [{ name: 'BatGun', description: 'deprecated gun' }]
+
+itemGetted = await Redis.get('Joker');
+
+console.log(itemGetted); // []
 
 // DELETE
 

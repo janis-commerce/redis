@@ -81,7 +81,7 @@ describe('Redis', () => {
 
 	describe('Get', () => {
 
-		it('Should return null if a profile does not exist', async () => {
+		it('Should return null if an entity and id does not exist', async () => {
 
 			const redisClientStub = {
 				hget: sandbox.fake.resolves(null)
@@ -94,7 +94,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(value, null);
 		});
 
-		it('Should return the object if a profile is found', async () => {
+		it('Should return the object if an entity and id is found', async () => {
 
 			const redisClientStub = {
 				hget: sandbox.fake.resolves(JSON.stringify(sampleValue))
@@ -107,21 +107,49 @@ describe('Redis', () => {
 			assert.deepStrictEqual(value, sampleValue);
 		});
 
+		it('Should return an array of objects if an entity is found and no id is passed', async () => {
+
+			const redisClientStub = {
+				hgetall: sandbox.fake.resolves([JSON.stringify(sampleValue)])
+			};
+
+			sandbox.stub(Redis, 'client').get(() => redisClientStub);
+
+			const value = await Redis.get(sampleEntity);
+
+			assert.deepStrictEqual(value, [sampleValue]);
+		});
+
+		it('Should return an empty array of objects if an entity is not found and no id is passed', async () => {
+
+			const redisClientStub = {
+				hgetall: sandbox.fake.resolves([])
+			};
+
+			sandbox.stub(Redis, 'client').get(() => redisClientStub);
+
+			const value = await Redis.get(sampleEntity);
+
+			assert.deepStrictEqual(value, []);
+		});
+
 		it('Should reject if can not get', async () => {
 			const redisClientStub = {
-				hget: sandbox.fake.rejects()
+				hget: sandbox.fake.rejects(),
+				hgetall: sandbox.fake.rejects()
 			};
 
 			sandbox.stub(Redis, 'client').get(() => redisClientStub);
 
 			await assert.rejects(Redis.get(sampleEntity, sampleId), { code: RedisError.codes.GET_PROBLEM });
+			await assert.rejects(Redis.get(sampleEntity), { code: RedisError.codes.GET_PROBLEM });
 
 		});
 	});
 
 	describe('Delete', () => {
 
-		it('Should return 1 if a profile is deleted', async () => {
+		it('Should return 1 if an entity and id is deleted', async () => {
 
 			const redisClientStub = {
 				hdel: sandbox.fake.resolves(1)
@@ -134,7 +162,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(value, 1);
 		});
 
-		it('Should return 0 if a profile does not exist', async () => {
+		it('Should return 0 if an entity and id does not exist', async () => {
 
 			const redisClientStub = {
 				hdel: sandbox.fake.resolves(0)
