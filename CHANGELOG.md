@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2020-09-11
+## [1.1.0] - 2020-09-11
 ### Added
 - GitHub Actions for workflows build, coverage and publish
 
@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated package dependencies
 
 ### Fixed
-- Bug when no results found
+- Bug on `get()` when no id received, now returns an object
 
 ### Removed
 - Travis
