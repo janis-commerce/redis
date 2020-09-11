@@ -52,7 +52,8 @@ Throw an `RedisError` if Redis Server fails.
 * `id`, type: `string`, sub key. *OPTIONAL*
 
 With `ìd` - Returns an `object`, with the value. If it not exists returns `null`. 
-Without `ìd` - Returns an `array`, with the values of the Entity or an empty array (if no values are found)
+
+Without `ìd` - Returns an `object`, with all the keys and values found for the entity received
 
 Throw an `RedisError` if Redis Server fails.
 

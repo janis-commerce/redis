@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2020-09-11
+### Added
+- GitHub Actions for workflows build, coverage and publish
+
+### Changed
+- Redis version up to `^3.0.2`
+- Updated package dependencies
+
+### Fixed
+- Bug when no results found
+
+### Removed
+- Travis
+
 ## [1.0.0] - 2019-10-09
 ### Added
 - `Redis`

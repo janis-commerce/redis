@@ -107,30 +107,38 @@ describe('Redis', () => {
 			assert.deepStrictEqual(value, sampleValue);
 		});
 
-		it('Should return an array of objects if an entity is found and no id is passed', async () => {
+		it('Should return the parsed object if an entity is found', async () => {
+
+			const fullSampleValue = {
+				oneKey: JSON.stringify({ foo: 1, bar: 2 }),
+				otherKey: JSON.stringify(['foo', 'bar'])
+			};
 
 			const redisClientStub = {
-				hgetall: sandbox.fake.resolves([JSON.stringify(sampleValue)])
+				hgetall: sandbox.fake.resolves(fullSampleValue)
 			};
 
 			sandbox.stub(Redis, 'client').get(() => redisClientStub);
 
 			const value = await Redis.get(sampleEntity);
 
-			assert.deepStrictEqual(value, [sampleValue]);
+			assert.deepStrictEqual(value, {
+				oneKey: { foo: 1, bar: 2 },
+				otherKey: ['foo', 'bar']
+			});
 		});
 
 		it('Should return an empty array of objects if an entity is not found and no id is passed', async () => {
 
 			const redisClientStub = {
-				hgetall: sandbox.fake.resolves([])
+				hgetall: sandbox.fake.resolves({})
 			};
 
 			sandbox.stub(Redis, 'client').get(() => redisClientStub);
 
 			const value = await Redis.get(sampleEntity);
 
-			assert.deepStrictEqual(value, []);
+			assert.deepStrictEqual(value, {});
 		});
 
 		it('Should reject if can not get', async () => {
