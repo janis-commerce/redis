@@ -1,17 +1,26 @@
 # redis
 
-[![Build Status](https://travis-ci.org/janis-commerce/redis.svg?branch=master)](https://travis-ci.org/janis-commerce/redis)
+![Build Status](https://github.com/janis-commerce/redis/workflows/Build%20Status/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/janis-commerce/redis/badge.svg?branch=master)](https://coveralls.io/github/janis-commerce/redis?branch=master)
+[![npm version](https://badge.fury.io/js/%40janiscommerce%2Fredis.svg)](https://www.npmjs.com/package/@janiscommerce/redis)
 
 ## Installation
 ```sh
-npm install @janiscommerce/redis --save
+npm install @janiscommerce/redis
 ```
 
-## Configuration
-This package uses [@janiscommerce/settings](https://www.npmjs.com/package/@janiscommerce/settings). 
+## Breaking changes _Since 2.0.0_ :warning:
+- Config `host` is required to connect. Connection will be ignored if not received.
+- The package now works as a wrapper of [redis](https://www.npmjs.com/package/redis) package for using Redis commands
+- Removed Api method `set()`, `get()`, `del()`, use [redis](https://www.npmjs.com/package/redis) commands instead
+- Now _async_ method `connect()` must be executed before using any other command.
 
-In `.janiscommercerc.json` file could have the configuration, under `"redis"` key and `"host"` and / or `"port"` values (both optionals).
+## Configuration
+This package uses [@janiscommerce/settings](https://www.npmjs.com/package/@janiscommerce/settings).
+
+In `.janiscommercerc.json` file requires to have the configuration under the `redis`.
+- The field `host` is required.
+- The field `port` is optional. Default value is set by [redis](https://www.npmjs.com/package/redis), See more information in [client-configuration](https://github.com/redis/node-redis/blob/master/docs/client-configuration.md)
 
 ### Example
 ```json
@@ -23,116 +32,34 @@ In `.janiscommercerc.json` file could have the configuration, under `"redis"` ke
 }
 ```
 
-### Defaults
-If there isn't any settings the `host` and `port` would be default:
-- `host`: `localhost`
-- `port`: `6379`
-
 ## API
 
-### `set(entity, id, value)`
+### `connect()`
 
-**async** | Saved or Updated a value.
+**async** | Connects the Redis server using settings.
 
-* `entity`, type: `string`, main key.
-* `id`, type: `string`, sub key.
-* `value`, type: `object`, value to be saved.
+Returns:
+* `client`: The Redis client when `host` is present in settings.
+* `undefined`: When `host` is not present in settings.
 
-Returns an `integer`:
-* `1`, saved a new value
-* `0`, updated a value
-
-Throw an `RedisError` if Redis Server fails.
-
-### `get(entity, id)`
-
-**async** | Get a value.
-
-* `entity`, type: `string`, main key.
-* `id`, type: `string`, sub key. *OPTIONAL*
-
-With `ìd` - Returns an `object`, with the value. If it not exists returns `null`. 
-
-Without `ìd` - Returns an `object`, with all the keys and values found for the entity received
-
-Throw an `RedisError` if Redis Server fails.
-
-### `del(entity, id)` 
-
-**async** | Delete a value.
-
-* `entity`, type: `string`, main key.
-* `id`, type: `string`, sub key.
-
-Returns an `integer`:
-* `1`, delete de registry
-* `0`, no delete
-
-Throw an `RedisError` if Redis Server fails.
-
-## Errors
-
-The errors are informed with a `RedisError`.  
-This object has a code that can be useful for a correct error handling.  
-The codes are the following:  
-
-| Code | Description                    |
-|------|--------------------------------|
-| 1    | Connections Errors             |
-| 2    | Errors trying to Set           |
-| 3    | Errors trying to Get           |
-| 4    | Errors trying to Delete        |
+Throw an `Error` if Redis Server fails.
 
 ## Usage
 ```js
+
 const Redis = require('@janiscommerce/redis');
 
-// SET - Insert
+(async () => {
 
-const itemProperties = {
-   name: 'BatGun' ,
-   description: 'not a gun'
-}
+    const redisClient = await Redis.connect();
 
-let saved = await Redis.set('Batman', 'artifact-01', itemProperties);
+    await redisClient.set('product-123', 'blue-shirt');
 
-console.log(saved); // 1
+    const value = await redisClient.get('product-123');
 
-// SET - Update
+    // expected value: blue-shirt
 
-itemProperties.description = 'deprecated gun';
-
-saved = await Redis.set('Batman', 'artifact-01', itemProperties);
-
-console.log(saved) // 0
-
-// GET
-
-let itemGetted = await Redis.get('Batman', 'artifact-01');
-
-console.log(itemGetted); // { name: 'BatGun', description: 'deprecated gun' }
-
-itemGetted = await Redis.get('Batman', 'artifact-02');
-
-console.log(itemGetted); // null
-
-itemGetted = await Redis.get('Batman');
-
-console.log(itemGetted); // [{ name: 'BatGun', description: 'deprecated gun' }]
-
-itemGetted = await Redis.get('Joker');
-
-console.log(itemGetted); // []
-
-// DELETE
-
-let deleted = await Redis.del('Batman', 'artifact-01');
-
-console.log(deleted); // 1
-
-deleted = await Redis.del('Batman', 'artifact-01');
-
-console.log(deleted); // 0
-
+})();
 ```
 
+> :information_source: For more examples see [redis](https://www.npmjs.com/package/redis)

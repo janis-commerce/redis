@@ -19,7 +19,8 @@ module.exports = {
 	},
 
 	parserOptions: {
-		sourceType: 'script'
+		sourceType: 'script',
+		ecmaVersion: 2020
 	},
 
 	settings: {
@@ -45,7 +46,7 @@ module.exports = {
 		'no-underscore-dangle': ['warn', {
 			allowAfterThis: true,
 			allowAfterSuper: true,
-			allow: ['_call', '__rootpath', '_where', '_client', '_config']
+			allow: ['_call', '__rootpath', '_where']
 		}],
 
 		'no-tabs': 0,
@@ -55,9 +56,9 @@ module.exports = {
 		'func-names': 0,
 
 		'space-before-function-paren': ['error', {
-			'anonymous': 'never',
-			'named': 'never',
-			'asyncArrow': 'always'
+			anonymous: 'never',
+			named: 'never',
+			asyncArrow: 'always'
 		}],
 
 		'arrow-parens': ['error', 'as-needed'],
