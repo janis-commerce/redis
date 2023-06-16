@@ -34,6 +34,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "@janiscommerce/events": "^0.2.0",
     "@janiscommerce/settings": "^1.0.1",
     "@redis/client": "^1.5.7"
   }

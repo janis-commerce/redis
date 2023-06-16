@@ -16,6 +16,15 @@ npm install @janiscommerce/redis
 - Now _async_ method `connect()` must be executed before using any other command.
 
 ## Configuration
+
+### Env Vars
+
+If the env vars `REDIS_WRITE_URL` and `REDIS_READ_URL` are set, will create a Redis cluster connection
+
+### Settings
+
+> :warning: **Deprecated** :warning:
+
 This package uses [@janiscommerce/settings](https://www.npmjs.com/package/@janiscommerce/settings).
 
 In `.janiscommercerc.json` file requires to have the configuration under the `redis`.
@@ -51,11 +60,11 @@ const Redis = require('@janiscommerce/redis');
 
 (async () => {
 
-    const redisClient = await Redis.connect();
+    const redisCluster = await Redis.connect();
 
-    await redisClient.set('product-123', 'blue-shirt');
+    await redisCluster.set('product-123', 'blue-shirt');
 
-    const value = await redisClient.get('product-123');
+    const value = await redisCluster.get('product-123');
 
     // expected value: blue-shirt
 
