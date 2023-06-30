@@ -62,7 +62,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(createdConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				socket: { host: 'write.redis.my-service.com' }
+				url: 'write.redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
@@ -91,7 +91,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(createdConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				socket: { host: 'redis.my-service.com' }
+				url: 'redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
@@ -124,7 +124,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(otherConnConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				socket: { host: 'write.redis.my-service.com' }
+				url: 'write.redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
