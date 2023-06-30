@@ -9,6 +9,7 @@
     "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/",
     "coverage": "nyc npm test",
     "lint": "eslint lib/ tests/",
+    "build-types": "tsc lib/redis.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --outDir types",
     "prepare": "husky install"
   },
   "repository": {
@@ -19,24 +20,27 @@
   "license": "ISC",
   "homepage": "https://github.com/janis-commerce/redis.git#readme",
   "devDependencies": {
-    "husky": "^8.0.3",
-    "eslint": "^8.40.0",
-    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint": "^8.43.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
+    "husky": "^8.0.3",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "sinon": "^15.0.4"
+    "sinon": "^15.2.0",
+    "typescript": "^5.1.6"
   },
   "files": [
-    "lib/"
+    "lib/",
+    "types/"
   ],
+  "types": "types/index.d.ts",
   "directories": {
     "test": "tests"
   },
   "dependencies": {
     "@janiscommerce/events": "^0.2.0",
     "@janiscommerce/settings": "^1.0.1",
-    "@redis/client": "^1.5.7",
+    "@redis/client": "^1.5.8",
     "lllog": "^1.1.2"
   }
 }

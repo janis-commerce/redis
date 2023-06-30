@@ -250,7 +250,7 @@ describe('Redis', () => {
 			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
-		it('Should close connection after janiscommerce.ended is emitted', async () => {
+		it('Should close connection after janiscommerce.ended is emitted if conn is open', async () => {
 
 			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
 
@@ -258,7 +258,7 @@ describe('Redis', () => {
 			const quitStub = sinon.stub().resolves();
 			const on = sinon.stub();
 
-			const cluster = { connect: connectStub, quit: quitStub, on };
+			const cluster = { connect: connectStub, quit: quitStub, on, isOpen: true };
 
 			sinon.stub(RedisLib, 'createCluster')
 				.returns(cluster);
@@ -270,6 +270,29 @@ describe('Redis', () => {
 
 			sinon.assert.calledOnceWithExactly(connectStub);
 			sinon.assert.calledOnceWithExactly(quitStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
+		it('Should not close connection after janiscommerce.ended is emitted if conn is not open', async () => {
+
+			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const cluster = { connect: connectStub, quit: quitStub, on, isOpen: false };
+
+			sinon.stub(RedisLib, 'createCluster')
+				.returns(cluster);
+
+			await Redis.connect();
+
+			await Events.emit('janiscommerce.ended');
+			await Events.emit('janiscommerce.ended');
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.notCalled(quitStub);
 			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 

@@ -118,6 +118,7 @@ module.exports = {
 			ObjectExpression: { minProperties: 5, multiline: true, consistent: true },
 			ObjectPattern: { minProperties: 5, multiline: true, consistent: true }
 		}],
-		'nonblock-statement-body-position': ['error', 'below', { overrides: { else: 'any' } }]
+		'nonblock-statement-body-position': ['error', 'below', { overrides: { else: 'any' } }],
+		strict: ['error', 'global']
 	}
 };
