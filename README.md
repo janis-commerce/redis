@@ -17,11 +17,13 @@ npm install @janiscommerce/redis
 
 ## Configuration
 
-### Env Vars
+### Client configuration
 
-If the env vars `REDIS_WRITE_URL` and `REDIS_READ_URL` are set, will create a Redis cluster connection
+#### Env Vars
 
-### Settings
+If the env vars `REDIS_WRITE_URL` is set, will create a Redis connection
+
+#### Settings
 
 > :warning: **Deprecated** :warning:
 
@@ -29,17 +31,22 @@ This package uses [@janiscommerce/settings](https://www.npmjs.com/package/@janis
 
 In `.janiscommercerc.json` file requires to have the configuration under the `redis`.
 - The field `host` is required.
-- The field `port` is optional. Default value is set by [redis](https://www.npmjs.com/package/redis), See more information in [client-configuration](https://github.com/redis/node-redis/blob/master/docs/client-configuration.md)
 
-### Example
+See an example below
+
 ```json
 {
     "redis": {
-        "host": "redis.example.host",
-        "port": 4040
+        "host": "redis.example.host"
     }
 }
 ```
+
+### Cluster Mode
+
+The env var `REDIS_CLUSTER_MODE` must be set with a truthy value.
+
+Then, the env vars `REDIS_WRITE_URL` and `REDIS_READ_URL` will be used for creating a Redis cluster connection.
 
 ## API
 
