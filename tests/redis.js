@@ -46,8 +46,9 @@ describe('Redis', () => {
 
 			const connectStub = sinon.stub().resolves();
 			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const conn = { connect: connectStub, quit: quitStub };
+			const conn = { connect: connectStub, quit: quitStub, on };
 
 			stubSettings();
 
@@ -67,14 +68,16 @@ describe('Redis', () => {
 			sinon.assert.calledOnceWithExactly(connectStub);
 
 			sinon.assert.notCalled(Settings.get);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should create Redis client when configured using Settings', async () => {
 
 			const connectStub = sinon.stub().resolves();
 			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const conn = { connect: connectStub, quit: quitStub };
+			const conn = { connect: connectStub, quit: quitStub, on };
 
 			sinon.stub(RedisLib, 'createClient')
 				.returns(conn);
@@ -94,6 +97,7 @@ describe('Redis', () => {
 			sinon.assert.calledOnceWithExactly(connectStub);
 
 			sinon.assert.calledOnceWithExactly(Settings.get, 'redis');
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should re-use Redis client after connect a second time', async () => {
@@ -104,8 +108,9 @@ describe('Redis', () => {
 
 			const connectStub = sinon.stub().resolves();
 			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const conn = { connect: connectStub, quit: quitStub };
+			const conn = { connect: connectStub, quit: quitStub, on };
 
 			sinon.stub(RedisLib, 'createClient')
 				.returns(conn);
@@ -125,6 +130,7 @@ describe('Redis', () => {
 			sinon.assert.calledOnceWithExactly(connectStub);
 
 			sinon.assert.notCalled(Settings.get);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should not connect when env vars nor setting were configured', async () => {
@@ -164,8 +170,9 @@ describe('Redis', () => {
 
 			const connectStub = sinon.stub().resolves();
 			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const cluster = { connect: connectStub, quit: quitStub };
+			const cluster = { connect: connectStub, quit: quitStub, on };
 
 			sinon.stub(RedisLib, 'createCluster')
 				.returns(cluster);
@@ -182,6 +189,7 @@ describe('Redis', () => {
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should create Redis cluster using env vars REDIS_WRITE_URL and REDIS_READ_URL', async () => {
@@ -190,8 +198,10 @@ describe('Redis', () => {
 			process.env.REDIS_READ_URL = 'read.redis.my-service.com';
 
 			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const cluster = { connect: connectStub };
+			const cluster = { connect: connectStub, quit: quitStub, on };
 
 			sinon.stub(RedisLib, 'createCluster')
 				.returns(cluster);
@@ -211,6 +221,7 @@ describe('Redis', () => {
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should re-use Redis cluster after connect a second time', async () => {
@@ -218,8 +229,10 @@ describe('Redis', () => {
 			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
 
 			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
 
-			const cluster = { connect: connectStub };
+			const cluster = { connect: connectStub, quit: quitStub, on };
 
 			sinon.stub(RedisLib, 'createCluster')
 				.returns(cluster);
@@ -234,6 +247,30 @@ describe('Redis', () => {
 
 			sinon.assert.calledOnce(RedisLib.createCluster);
 			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
+		it('Should close connection after janiscommerce.ended is emitted', async () => {
+
+			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const cluster = { connect: connectStub, quit: quitStub, on };
+
+			sinon.stub(RedisLib, 'createCluster')
+				.returns(cluster);
+
+			await Redis.connect();
+
+			await Events.emit('janiscommerce.ended');
+			await Events.emit('janiscommerce.ended');
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(quitStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 
 		it('Should not connect when env vars were not configured', async () => {
@@ -247,30 +284,6 @@ describe('Redis', () => {
 			assert.deepStrictEqual(connResult, undefined);
 
 			sinon.assert.notCalled(RedisLib.createCluster);
-		});
-
-		it('Should close connection after janiscommerce.ended is emitted', async () => {
-
-			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
-
-			const connectStub = sinon.stub().resolves();
-			const quitStub = sinon.stub().resolves();
-
-			const cluster = {
-				connect: connectStub,
-				quit: quitStub
-			};
-
-			sinon.stub(RedisLib, 'createCluster')
-				.returns(cluster);
-
-			await Redis.connect();
-
-			await Events.emit('janiscommerce.ended');
-			await Events.emit('janiscommerce.ended');
-
-			sinon.assert.calledOnceWithExactly(connectStub);
-			sinon.assert.calledOnceWithExactly(quitStub);
 		});
 	});
 });
