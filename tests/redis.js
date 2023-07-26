@@ -40,6 +40,35 @@ describe('Redis', () => {
 			sinon.assert.notCalled(RedisLib.createCluster);
 		});
 
+		it('Should create Redis client when configured using url parameter in connect()', async () => {
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const conn = { connect: connectStub, quit: quitStub, on };
+
+			stubSettings();
+
+			sinon.stub(RedisLib, 'createClient')
+				.returns(conn);
+
+			const createdConn = await Redis.connect({ url: 'redis://write.redis.my-service.com' });
+
+			await Events.emit('janiscommerce.ended');
+
+			assert.deepStrictEqual(createdConn, conn);
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
+				url: 'redis://write.redis.my-service.com'
+			});
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+
+			sinon.assert.notCalled(Settings.get);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
 		it('Should create Redis client when configured using env var REDIS_WRITE_URL', async () => {
 
 			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
@@ -62,7 +91,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(createdConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				url: 'write.redis.my-service.com'
+				url: 'redis://write.redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
@@ -91,7 +120,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(createdConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				url: 'redis.my-service.com'
+				url: 'redis://redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
@@ -124,7 +153,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(otherConnConn, conn);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
-				url: 'write.redis.my-service.com'
+				url: 'redis://write.redis.my-service.com'
 			});
 
 			sinon.assert.calledOnceWithExactly(connectStub);
@@ -164,6 +193,61 @@ describe('Redis', () => {
 			sinon.assert.notCalled(RedisLib.createClient);
 		});
 
+		it('Should create Redis cluster using url parameter as string in connect()', async () => {
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const cluster = { connect: connectStub, quit: quitStub, on };
+
+			sinon.stub(RedisLib, 'createCluster')
+				.returns(cluster);
+
+			const createdConn = await Redis.connect({ url: 'write.redis.my-service.com' });
+
+			await Events.emit('janiscommerce.ended');
+
+			assert.deepStrictEqual(createdConn, cluster);
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createCluster, {
+				rootNodes: [{ url: 'redis://write.redis.my-service.com' }],
+				useReplicas: true
+			});
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
+		it('Should create Redis cluster using parameter with multiple urls in connect()', async () => {
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const cluster = { connect: connectStub, quit: quitStub, on };
+
+			sinon.stub(RedisLib, 'createCluster')
+				.returns(cluster);
+
+			const createdConn = await Redis.connect({ url: ['write.redis.my-service.com', 'read.redis.my-service.com'] });
+
+			await Events.emit('janiscommerce.ended');
+
+			assert.deepStrictEqual(createdConn, cluster);
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createCluster, {
+				rootNodes: [
+					{ url: 'redis://write.redis.my-service.com' },
+					{ url: 'redis://read.redis.my-service.com' }
+				],
+				useReplicas: true
+			});
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
 		it('Should create Redis cluster using env vars REDIS_WRITE_URL', async () => {
 
 			process.env.REDIS_WRITE_URL = 'write.redis.my-service.com';
@@ -184,7 +268,7 @@ describe('Redis', () => {
 			assert.deepStrictEqual(createdConn, cluster);
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createCluster, {
-				rootNodes: [{ url: 'write.redis.my-service.com' }],
+				rootNodes: [{ url: 'redis://write.redis.my-service.com' }],
 				useReplicas: true
 			});
 
@@ -214,8 +298,8 @@ describe('Redis', () => {
 
 			sinon.assert.calledOnceWithExactly(RedisLib.createCluster, {
 				rootNodes: [
-					{ url: 'write.redis.my-service.com' },
-					{ url: 'read.redis.my-service.com' }
+					{ url: 'redis://write.redis.my-service.com' },
+					{ url: 'redis://read.redis.my-service.com' }
 				],
 				useReplicas: true
 			});

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.3.0] - 2023-07-26
+### Added
+- Optional parameter `config` in `connect()` method for receiving `url`.
+
+### Changed
+- Now `url` are fixed adding `redis://` in the beginning or the url when not received.
+
 ## [2.2.0] - 2023-06-30
 ### Added
 - Using env variable `REDIS_CLUSTER_MODE` for cluster connection.

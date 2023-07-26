@@ -23,6 +23,12 @@ npm install @janiscommerce/redis
 
 If the env vars `REDIS_WRITE_URL` is set, will create a Redis connection
 
+#### Config object parameter
+
+_Since 2.3.0_
+
+The `connect()` allows to receive an object with the `url`.
+
 #### Settings
 
 > :warning: **Deprecated** :warning:
@@ -46,15 +52,28 @@ See an example below
 
 The env var `REDIS_CLUSTER_MODE` must be set with a truthy value.
 
-Then, the env vars `REDIS_WRITE_URL` and `REDIS_READ_URL` will be used for creating a Redis cluster connection.
+#### Env Vars
+
+If the env vars `REDIS_WRITE_URL` and `REDIS_READ_URL` will be used for creating a Redis cluster connection.
+
+#### Config object parameter
+
+_Since 2.3.0_
+
+The `connect()` allows to receive an object with the `url` as _String_ or _String Array_.
 
 ## API
 
-### `connect()`
+### `connect(config = {})`
 
 **async** | Connects the Redis server using settings.
 
-Returns:
+#### Parameters
+- `config` the optional configuration.
+    -  `config.url` optional url as _String_ for connecting the client of cluster. _Since 2.3.0_
+    -  `config.url` optional url as _String Array_ for connecting. Exclusive for in cluster mode. _Since 2.3.0_
+
+#### Return
 * `client`: The Redis client when `host` is present in settings.
 * `undefined`: When `host` is not present in settings.
 
