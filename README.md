@@ -68,10 +68,11 @@ The `connect()` allows to receive an object with the `url` as _String_ or _Strin
 
 **async** | Connects the Redis server using settings.
 
-#### Parameters
+#### :new: Parameters
 - `config` the optional configuration.
     -  `config.url` optional url as _String_ for connecting the client of cluster. _Since 2.3.0_
     -  `config.url` optional url as _String Array_ for connecting. Exclusive for in cluster mode. _Since 2.3.0_
+    -  :new: `config.maxRetries` optional _Number_ indicates the max amount of connection retries, when the max retries are reached the Client stops retrying and throws an error. (Default: `3`)
 
 #### Return
 * `client`: The Redis client when `host` is present in settings.
@@ -87,6 +88,19 @@ const Redis = require('@janiscommerce/redis');
 (async () => {
 
     const redisCluster = await Redis.connect();
+
+    await redisCluster.set('product-123', 'blue-shirt');
+
+    const value = await redisCluster.get('product-123');
+
+    // expected value: blue-shirt
+
+})();
+
+// Usage with custom max retries
+(async () => {
+
+    const redisCluster = await Redis.connect({ maxRetries: 1 });
 
     await redisCluster.set('product-123', 'blue-shirt');
 
