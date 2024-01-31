@@ -222,8 +222,7 @@ describe('Redis', () => {
 			// Every retry returns the retry count by 50
 			assert.deepStrictEqual(reconnectStrategy(0), 0);
 			assert.deepStrictEqual(reconnectStrategy(1), 50);
-			assert.deepStrictEqual(reconnectStrategy(2), 100);
-			assert.deepStrictEqual(reconnectStrategy(3), new Error('Max connection retries (3) reached.'));
+			assert.deepStrictEqual(reconnectStrategy(2), new Error('Max connection retries (3) reached.'));
 		});
 
 		it('Should use the recevied maxRetries when its received', async () => {
@@ -258,8 +257,7 @@ describe('Redis', () => {
 			const { reconnectStrategy } = RedisLib.createClient.lastCall.lastArg.socket;
 
 			// Every retry returns the retry count by 50
-			assert.deepStrictEqual(reconnectStrategy(0), 0);
-			assert.deepStrictEqual(reconnectStrategy(1), new Error('Max connection retries (1) reached.'));
+			assert.deepStrictEqual(reconnectStrategy(0), new Error('Max connection retries (1) reached.'));
 		});
 	});
 
