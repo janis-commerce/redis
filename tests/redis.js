@@ -30,6 +30,17 @@ describe('Redis', () => {
 		Redis.cleanConn();
 	});
 
+	describe('Error Codes', () => {
+
+		it('Should return the Redis Error code', async () => {
+			assert.deepStrictEqual(Redis.errorCodes.REDIS_ERROR, RedisError.codes.REDIS_ERROR);
+		});
+
+		it('Should return the Max connection retries error', async () => {
+			assert.deepStrictEqual(Redis.errorCodes.MAX_CONNECTION_RETRIES, RedisError.codes.MAX_CONNECTION_RETRIES);
+		});
+	});
+
 	describe('Client Mode', () => {
 
 		beforeEach(() => {
