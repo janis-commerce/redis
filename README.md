@@ -80,6 +80,10 @@ The `connect()` allows to receive an object with the `url` as _String_ or _Strin
 
 Throw an `Error` if Redis Server fails.
 
+### `closeConnection()`
+
+**async** | Closes the active connection.
+
 ## Usage
 ```js
 
@@ -100,14 +104,13 @@ const Redis = require('@janiscommerce/redis');
 // Usage with custom max retries
 (async () => {
 
-    const redisCluster = await Redis.connect({ maxRetries: 1 });
+    try {
 
-    await redisCluster.set('product-123', 'blue-shirt');
+        const redisCluster = await Redis.connect({ maxRetries: 1 });
 
-    const value = await redisCluster.get('product-123');
-
-    // expected value: blue-shirt
-
+    }catch(err) {
+        await Redis.closeConnection();
+    }
 })();
 ```
 
