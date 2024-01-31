@@ -8,10 +8,10 @@ const sinon = require('sinon');
 const RedisLib = require('@redis/client');
 
 const Settings = require('@janiscommerce/settings');
-
 const Events = require('@janiscommerce/events');
 
 const Redis = require('../lib/redis');
+const RedisError = require('../lib/redis-error');
 
 describe('Redis', () => {
 
@@ -260,6 +260,74 @@ describe('Redis', () => {
 			// Every retry returns the retry count by 50
 			assert.deepStrictEqual(reconnectStrategy(0), 0);
 			assert.deepStrictEqual(reconnectStrategy(1), new Error('Max connection retries (1) reached.'));
+		});
+
+		it('Should throw max retries error when Redis.connect() fails with ReconnectStrategyError', async () => {
+
+			const SampleRedisError = class ReconnectStrategyError extends Error {};
+
+			const connectStub = sinon.stub()
+				.rejects(new SampleRedisError('Connection timeout'));
+
+			const quitStub = sinon.stub();
+			const on = sinon.stub();
+
+			const conn = { connect: connectStub, quit: quitStub, on };
+
+			stubSettings();
+
+			sinon.stub(RedisLib, 'createClient')
+				.returns(conn);
+
+			await assert.rejects(Redis.connect({ url: 'redis://write.redis.my-service.com' }), {
+				name: RedisError.name,
+				code: RedisError.codes.MAX_CONNECTION_RETRIES
+			});
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
+				url: 'redis://write.redis.my-service.com',
+				socket: {
+					reconnectStrategy: sinon.match.func
+				}
+			});
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+
+			sinon.assert.notCalled(Settings.get);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
+		});
+
+		it('Should throw redis error when Redis.connect() fails with an Error', async () => {
+
+			const connectStub = sinon.stub()
+				.rejects(new Error('Redis error'));
+
+			const quitStub = sinon.stub();
+			const on = sinon.stub();
+
+			const conn = { connect: connectStub, quit: quitStub, on };
+
+			stubSettings();
+
+			sinon.stub(RedisLib, 'createClient')
+				.returns(conn);
+
+			await assert.rejects(Redis.connect({ url: 'redis://write.redis.my-service.com' }), {
+				name: RedisError.name,
+				code: RedisError.codes.REDIS_ERROR
+			});
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
+				url: 'redis://write.redis.my-service.com',
+				socket: {
+					reconnectStrategy: sinon.match.func
+				}
+			});
+
+			sinon.assert.calledOnceWithExactly(connectStub);
+
+			sinon.assert.notCalled(Settings.get);
+			sinon.assert.calledOnceWithExactly(on, 'error', sinon.match.func);
 		});
 	});
 
