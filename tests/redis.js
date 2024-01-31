@@ -268,7 +268,7 @@ describe('Redis', () => {
 			});
 		});
 
-		it('Should use the recevied maxRetries when its received', async () => {
+		it('Should use the received maxRetries when its received', async () => {
 
 			const connectStub = sinon.stub().resolves();
 			const quitStub = sinon.stub().resolves();
@@ -302,6 +302,40 @@ describe('Redis', () => {
 			// Every retry returns the retry count by 50
 			assert.deepStrictEqual(reconnectStrategy(0), 0);
 			assert.deepStrictEqual(reconnectStrategy(1), new Error('Max connection retries (1) reached.'));
+		});
+
+		it('Should not retry if received maxRetries is 0', async () => {
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const conn = { connect: connectStub, quit: quitStub, on };
+
+			stubSettings();
+
+			sinon.stub(RedisLib, 'createClient')
+				.returns(conn);
+
+			const createdConn = await Redis.connect({
+				url: 'redis://write.redis.my-service.com',
+				maxRetries: 0
+			});
+
+			await Events.emit('janiscommerce.ended');
+
+			assert.deepStrictEqual(createdConn, conn);
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
+				url: 'redis://write.redis.my-service.com',
+				socket: {
+					reconnectStrategy: sinon.match.func
+				}
+			});
+
+			const { reconnectStrategy } = RedisLib.createClient.lastCall.lastArg.socket;
+
+			assert.deepStrictEqual(reconnectStrategy(0), new Error('Max connection retries (0) reached.'));
 		});
 
 		it('Should throw max retries error when Redis.connect() fails with ReconnectStrategyError', async () => {
