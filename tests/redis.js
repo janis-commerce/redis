@@ -237,6 +237,37 @@ describe('Redis', () => {
 			assert.deepStrictEqual(reconnectStrategy(3), new Error('Max connection retries (3) reached.'));
 		});
 
+		it('Should use the received connectTimeout when it is received', async () => {
+
+			const connectStub = sinon.stub().resolves();
+			const quitStub = sinon.stub().resolves();
+			const on = sinon.stub();
+
+			const conn = { connect: connectStub, quit: quitStub, on };
+
+			stubSettings();
+
+			sinon.stub(RedisLib, 'createClient')
+				.returns(conn);
+
+			const createdConn = await Redis.connect({
+				url: 'redis://write.redis.my-service.com',
+				connectTimeout: 1000
+			});
+
+			await Events.emit('janiscommerce.ended');
+
+			assert.deepStrictEqual(createdConn, conn);
+
+			sinon.assert.calledOnceWithExactly(RedisLib.createClient, {
+				url: 'redis://write.redis.my-service.com',
+				socket: {
+					connectTimeout: 1000,
+					reconnectStrategy: sinon.match.func
+				}
+			});
+		});
+
 		it('Should use the recevied maxRetries when its received', async () => {
 
 			const connectStub = sinon.stub().resolves();
