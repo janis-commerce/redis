@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.4.0] - 2024-02-01
+### Added
+- `config.maxRetries` param in `connect()` method for connection retries when it fails, default value 3.
+- `config.connectTimeout` param in `connect()` method for custom connection timeout in ms, default value 5000
+- Error codes for better error handling
+
 ## [2.3.0] - 2023-07-26
 ### Added
 - Optional parameter `config` in `connect()` method for receiving `url`.
