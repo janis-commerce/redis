@@ -68,16 +68,26 @@ The `connect()` allows to receive an object with the `url` as _String_ or _Strin
 
 **async** | Connects the Redis server using settings.
 
-#### Parameters
+#### :new: Parameters
 - `config` the optional configuration.
     -  `config.url` optional url as _String_ for connecting the client of cluster. _Since 2.3.0_
     -  `config.url` optional url as _String Array_ for connecting. Exclusive for in cluster mode. _Since 2.3.0_
+    -  :new: `config.maxRetries` optional _Number_ indicates the max amount of connection retries. (Default: `3`)
+        -   When the max retries are reached the Client stops retrying and throws an [error](#errors)
+        -   This **won't** close the cached connection, the cached connection will persist and won't retry to connect.
+            -   If you need to set a limit of retries but retry when your process is executed again, then `try catch` the error and use [closeConnection](#closeconnection)
+            -   If you don't want it to retry connection until your process is restarted, then don't need to close the connection.
+    -   :new: `config.connectTimeout` optional _Number_ indicates the connection timeout in **miliseconds**. (Default: `5000`)
 
 #### Return
 * `client`: The Redis client when `host` is present in settings.
 * `undefined`: When `host` is not present in settings.
 
 Throw an `Error` if Redis Server fails.
+
+### `closeConnection()`
+
+**async** | Closes the active connection.
 
 ## Usage
 ```js
@@ -95,6 +105,33 @@ const Redis = require('@janiscommerce/redis');
     // expected value: blue-shirt
 
 })();
+
+// Usage with custom max retries
+(async () => {
+
+    try {
+
+        const redisCluster = await Redis.connect({
+            connectTimeout: 1000,
+            maxRetries: 1
+        });
+
+    }catch(err) {
+        console.log(err.message);
+        await Redis.closeConnection();
+    }
+})();
 ```
+
+## Errors
+
+The errors are informed with a `RedisError`.
+This object has a code that can be useful for a debugging or error handling.
+The codes are the following:
+
+| Code | Description                        |
+|------|----------------------------------- |
+| 1    | Redis error                        |
+| 2    | Max connection retries reached     |
 
 > :information_source: For more examples see [redis](https://www.npmjs.com/package/redis)
