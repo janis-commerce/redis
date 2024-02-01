@@ -20,7 +20,7 @@ PACKAGE_VERSION=$(cat package.json \
 
 curl -s -X POST -H 'content-type: application/json' -d "
 	{
-		\"username\": \"API List\",
+		\"username\": \"Redis\",
 		\"icon_url\":\"https://static.janis.in/microservices-v2-logos/janis.png\",
-		\"text\": \":package: Versión $PACKAGE_VERSION publicada. <https://github.com/janis-commerce/api-list/blob/master/CHANGELOG.md|[CHANGELOG]>\"
+		\"text\": \":package: Versión $PACKAGE_VERSION publicada. <https://github.com/janis-commerce/redis/blob/master/CHANGELOG.md|[CHANGELOG]>\"
 	}" $SLACK_WEBHOOK
