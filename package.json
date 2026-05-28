@@ -10,8 +10,7 @@
     "coverage": "nyc npm test",
     "lint": "eslint lib/ tests/",
     "build-types": "tsc lib/redis.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --outDir types",
-    "prepare": "husky install",
-    "postpublish": "./.postpublish.sh"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
