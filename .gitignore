@@ -63,3 +63,4 @@ typings/
 
 # Built types definitions
 types/
+package-lock.json
