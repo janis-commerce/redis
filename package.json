@@ -5,12 +5,12 @@
   "main": "lib/redis.js",
   "scripts": {
     "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/",
-    "test-ci": "export TEST_ENV=true; nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/",
     "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/",
     "coverage": "nyc npm test",
     "lint": "eslint lib/ tests/",
     "build-types": "tsc lib/redis.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --outDir types",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "coverage-ci": "export TEST_ENV=true; nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/"
   },
   "repository": {
     "type": "git",
@@ -42,5 +42,8 @@
     "@janiscommerce/settings": "^1.0.1",
     "@redis/client": "^1.5.8",
     "lllog": "^1.1.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
